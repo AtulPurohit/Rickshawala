@@ -1,0 +1,16 @@
+{
+  "name": "RICKSHAWALA.FUN",
+  "short_name": "Rickshawala",
+  "description": "90s Hindi bangers and auto-rickshaw nostalgia.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "icons": [
+    {
+      "src": "assets/bg.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ]
+}
