@@ -199,9 +199,9 @@
         height: calc(var(--vh, 1vh) * 100);
       }
 
-      /* Push input above Safari bottom toolbar using safe-area-inset */
+      /* Push input comfortably above Safari bottom toolbar using safe-area-inset fallback */
       .chat-input-row {
-        padding-bottom: calc(0.8rem + env(safe-area-inset-bottom, 0px));
+        padding-bottom: max(2.4rem, calc(1.6rem + env(safe-area-inset-bottom, 24px))) !important;
       }
     }
 
@@ -1418,6 +1418,11 @@
         overflow: hidden !important;
         touch-action: manipulation;
         overscroll-behavior: contain;
+      }
+
+      .chat-input-row {
+        padding: 0.8rem 1rem max(2.4rem, calc(1.6rem + env(safe-area-inset-bottom, 24px))) 1rem !important;
+        background: rgba(14, 14, 18, 0.98) !important;
       }
     }
 
