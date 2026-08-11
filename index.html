@@ -1850,7 +1850,7 @@
             } catch(_) {}
             loadTrack(0);
 
-            // Poll until YouTube exposes the full playlist video IDs, then pre-populate all thumbnails
+            // Poll & sync live playlist items directly from YouTube API
             let tries = 0;
             const pollIds = setInterval(() => {
               tries++;
@@ -1858,17 +1858,10 @@
                 const ids = ytPlayer.getPlaylist();
                 if (ids && ids.length > 0) {
                   clearInterval(pollIds);
-                  ids.forEach((vid, i) => {
-                    if (i < PLAYLIST.length) PLAYLIST[i].ytId = vid;
-                  });
-                  renderPlaylist();
-                  // Also update the current track disc image
-                  if (PLAYLIST[0].ytId) {
-                    discImg.src = `https://i.ytimg.com/vi/${PLAYLIST[0].ytId}/hqdefault.jpg`;
-                  }
+                  syncLiveYouTubePlaylist();
                 }
               } catch(_) {}
-              if (tries > 20) clearInterval(pollIds); // give up after ~2s
+              if (tries > 25) clearInterval(pollIds);
             }, 100);
           },
           onStateChange(e) {
@@ -1882,9 +1875,17 @@
                 const data = ytPlayer.getVideoData();
                 if (data && data.video_id) {
                   const pIdx = ytPlayer.getPlaylistIndex();
-                  if (pIdx !== undefined && pIdx >= 0 && pIdx < PLAYLIST.length) {
+                  if (pIdx !== undefined && pIdx >= 0) {
                     currentTrackIdx = pIdx;
-                    PLAYLIST[pIdx].ytId = data.video_id;
+                    if (pIdx >= PLAYLIST.length) {
+                      // Dynamically create entry if track index exceeds initial array
+                      PLAYLIST[pIdx] = { title: data.title || `Track ${pIdx + 1}`, artist: data.author || "90s Special", duration: "5:00", ytId: data.video_id };
+                    } else {
+                      PLAYLIST[pIdx].ytId = data.video_id;
+                      if (data.title && (!PLAYLIST[pIdx].title || PLAYLIST[pIdx].title.startsWith("Track"))) {
+                        PLAYLIST[pIdx].title = data.title;
+                      }
+                    }
                     trackTitle.textContent = PLAYLIST[pIdx].title;
                     trackArtist.textContent = PLAYLIST[pIdx].artist;
                     discImg.src = `https://i.ytimg.com/vi/${data.video_id}/hqdefault.jpg`;
@@ -1901,6 +1902,53 @@
           }
         }
       });
+    }
+
+    // ── Dynamic YouTube Playlist Sync ──
+    async function syncLiveYouTubePlaylist() {
+      if (!ytPlayer || !ytPlayer.getPlaylist) return;
+      try {
+        const ids = ytPlayer.getPlaylist();
+        if (!ids || ids.length === 0) return;
+
+        for (let i = 0; i < ids.length; i++) {
+          const vid = ids[i];
+          if (i < PLAYLIST.length) {
+            PLAYLIST[i].ytId = vid;
+          } else {
+            // New track detected in live YouTube playlist! Fetch metadata via oEmbed
+            try {
+              const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${vid}`);
+              const json = await res.json();
+              const fullTitle = json.title || `Track ${i + 1}`;
+              let title = fullTitle;
+              let artist = "90s Special";
+              if (fullTitle.includes("-")) {
+                const parts = fullTitle.split("-");
+                artist = parts[0].trim();
+                title = parts.slice(1).join("-").trim();
+              }
+              PLAYLIST[i] = {
+                title: title,
+                artist: artist,
+                duration: "5:00",
+                ytId: vid
+              };
+            } catch (_) {
+              PLAYLIST[i] = {
+                title: `Track ${i + 1}`,
+                artist: "90s Special",
+                duration: "5:00",
+                ytId: vid
+              };
+            }
+          }
+        }
+        renderPlaylist();
+        if (PLAYLIST[currentTrackIdx] && PLAYLIST[currentTrackIdx].ytId) {
+          discImg.src = `https://i.ytimg.com/vi/${PLAYLIST[currentTrackIdx].ytId}/hqdefault.jpg`;
+        }
+      } catch (_) {}
     }
 
     // ── UI helpers ──
