@@ -192,11 +192,10 @@
         background-position: center center;
       }
 
-      /* Fix Safari mobile: 100dvh excludes browser chrome (address bar + bottom bar) */
+      /* Fix Safari mobile: 100dvh excludes browser chrome */
       .chat-drawer {
+        height: 100vh;
         height: 100dvh;
-        /* fallback for browsers without dvh support */
-        height: calc(var(--vh, 1vh) * 100);
       }
 
       /* Push input comfortably above Safari bottom toolbar using safe-area-inset fallback */
@@ -1286,16 +1285,15 @@
     @media (max-width: 768px) {
       html, body {
         overflow: hidden !important;
-        height: 100dvh;
         height: 100vh;
+        height: 100dvh;
         touch-action: manipulation;
       }
 
       .app-viewport {
         padding: 0.65rem 0.85rem;
-        height: 100dvh;
         height: 100vh;
-        max-height: 100dvh;
+        height: 100dvh;
         overflow: hidden;
         justify-content: space-between;
       }
@@ -2270,11 +2268,7 @@
     tickClock();
     setInterval(tickClock, 1000);
 
-    // Safari 100vh fix: set --vh to actual inner height (excludes browser chrome)
-    function setVH() { document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
-    setVH();
-    window.addEventListener('resize', setVH);
-    window.addEventListener('orientationchange', setVH);
+    // ── Real-time clock ──
 
     // ── Real-time visitor count via Firebase RTDB presence ──
     const userCountEl = document.getElementById('userCount');
