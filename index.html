@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
   <!-- Primary Meta Tags -->
   <title>RICKSHAWALA.FUN — 90s Hindi Bangers &amp; Nostalgia Rides</title>
@@ -1421,8 +1421,29 @@
       }
 
       .chat-input-row {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
         padding: 0.8rem 1rem max(2.4rem, calc(1.6rem + env(safe-area-inset-bottom, 24px))) 1rem !important;
         background: rgba(14, 14, 18, 0.98) !important;
+      }
+
+      .chat-input-row input {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        font-size: 16px !important; /* 16px prevents iOS Safari auto-zoom & layout shift */
+      }
+
+      .chat-input-row button {
+        flex: 0 0 36px !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        margin-left: 0.5rem !important;
       }
     }
 
@@ -2388,6 +2409,18 @@
       input.value = '';
       box.scrollTop = box.scrollHeight;
     }
+
+    // Keep window fixed at (0,0) when tapping text inputs on mobile iOS/Android
+    document.addEventListener('focusin', (e) => {
+      if (e.target && (e.target.id === 'chatInput' || e.target.id === 'userNameInput')) {
+        window.scrollTo(0, 0);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          const box = document.getElementById('chatMessages');
+          if (box) box.scrollTop = box.scrollHeight;
+        }, 80);
+      }
+    });
 
     // Direct Instagram App Deep Link with Web Fallback
     function openInstagram(e) {
