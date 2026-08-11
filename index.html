@@ -773,24 +773,22 @@
       cursor: pointer;
     }
 
-    /* Album Art — square with rounded corners, like image 2 */
+    /* Album Art / Full Cover Thumbnail (Rotating) */
     .album-art-wrap {
       position: relative;
-      width: 54px;
-      height: 54px;
+      width: 48px;
+      height: 48px;
       flex-shrink: 0;
     }
 
     .vinyl-disc {
       width: 100%;
       height: 100%;
-      border-radius: 12px;  /* square-ish rounded corners, not a circle */
-      border: none;
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.15),
-        0 6px 20px rgba(0, 0, 0, 0.7),
-        0 0 12px rgba(245, 197, 24, 0.2);
+      border-radius: 50%;
+      border: 2px solid var(--yellow);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
       overflow: hidden;
+      transition: transform 0.3s;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -801,7 +799,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 12px;
+      border-radius: 50%;
       display: block;
     }
 
