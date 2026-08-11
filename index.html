@@ -830,9 +830,11 @@
       padding: 1rem;
       display: flex;
       flex-direction: column;
+      justify-content: flex-end;
       gap: 0.8rem;
       scrollbar-width: thin;
       scrollbar-color: rgba(245, 197, 24, 0.3) transparent;
+      scroll-behavior: smooth;
     }
 
     .chat-msg {
@@ -2302,6 +2304,9 @@
             db.ref('presence').on('value', snap => {
               setCount(601 + snap.numChildren());
             });
+
+            // Initialize Live Realtime Chat via Firebase RTDB
+            initFirebaseChat(db);
           } catch(e) {
             let n = 628;
             setInterval(() => {
@@ -2313,32 +2318,75 @@
       });
     })();
 
-    // ── Live Chat Drawer & Name Modal Logic ──
+    // ── Live Chat Engine (Firebase RTDB + 24-Hour Expiry TTL) ──
     let chatUserName = localStorage.getItem('rickshawala_username') || '';
     let isChatOpen = false;
-    const initialChatMessages = [
-      { user: 'Rohan (Mumbai)', text: 'Altaf Raja ka song sunke purane din yaad aagaye yaar! 🚕', time: '4:21 PM' },
-      { user: 'Priya (Delhi)', text: 'Monsoon rain + 90s Bollywood bangers is top tier vibe 🌧️✨', time: '4:23 PM' },
-      { user: 'Mitul (Lucknow)', text: 'Bhai volume thoda badao, chai ke saath maza aagaya 🔥', time: '4:25 PM' },
-      { user: 'Simran (Jaipur)', text: 'Rickshawala Radio hits different at night! 🛺', time: '4:28 PM' }
+    let chatsRef = null;
+    const renderedMsgKeys = new Set();
+
+    const initialFallbackMessages = [
+      { user: 'Rohan (Mumbai)', text: 'Altaf Raja ka song sunke purane din yaad aagaye yaar! 🚕', timeStr: '4:21 PM', timestamp: Date.now() - 3600000 },
+      { user: 'Priya (Delhi)', text: 'Monsoon rain + 90s Bollywood bangers is top tier vibe 🌧️✨', timeStr: '4:23 PM', timestamp: Date.now() - 2400000 },
+      { user: 'Mitul (Lucknow)', text: 'Bhai volume thoda badao, chai ke saath maza aagaya 🔥', timeStr: '4:25 PM', timestamp: Date.now() - 1200000 },
+      { user: 'Simran (Jaipur)', text: 'Rickshawala Radio hits different at night! 🛺', timeStr: '4:28 PM', timestamp: Date.now() - 300000 }
     ];
+
+    function initFirebaseChat(db) {
+      try {
+        chatsRef = db.ref('chats');
+        const now = Date.now();
+        const cutoff24h = now - (24 * 60 * 60 * 1000); // 24 Hours in ms
+
+        // Clean up messages older than 24 hours from database
+        chatsRef.orderByChild('timestamp').endAt(cutoff24h).once('value', snap => {
+          snap.forEach(child => { child.ref.remove(); });
+        });
+
+        // Listen for new incoming real-time messages (within last 24 hours)
+        chatsRef.orderByChild('timestamp').startAt(cutoff24h).on('child_added', snapshot => {
+          const msg = snapshot.val();
+          if (msg && msg.timestamp >= cutoff24h) {
+            renderChatMessage(msg, snapshot.key);
+          }
+        });
+      } catch (_) {}
+    }
+
+    function renderChatMessage(msg, key) {
+      if (key && renderedMsgKeys.has(key)) return;
+      if (key) renderedMsgKeys.add(key);
+
+      const box = document.getElementById('chatMessages');
+      if (!box) return;
+
+      const isSelf = msg.user === chatUserName;
+      const div = document.createElement('div');
+      div.className = `chat-msg ${isSelf ? 'self' : ''}`;
+      const timeDisplay = msg.timeStr || (msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
+      
+      div.innerHTML = `
+        <div class="chat-msg-meta">
+          <span class="chat-msg-user">${escapeHtml(msg.user)}${isSelf ? ' (You)' : ''}</span>
+          <span>${timeDisplay}</span>
+        </div>
+        <div class="chat-msg-text">${escapeHtml(msg.text)}</div>
+      `;
+      box.appendChild(div);
+
+      // Smooth auto-scroll upward to latest message
+      requestAnimationFrame(() => {
+        box.scrollTop = box.scrollHeight;
+      });
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
     function renderInitialChat() {
       const box = document.getElementById('chatMessages');
       if (!box || box.children.length > 0) return;
-      initialChatMessages.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = 'chat-msg';
-        div.innerHTML = `
-          <div class="chat-msg-meta">
-            <span class="chat-msg-user">${msg.user}</span>
-            <span>${msg.time}</span>
-          </div>
-          <div class="chat-msg-text">${msg.text}</div>
-        `;
-        box.appendChild(div);
-      });
-      box.scrollTop = box.scrollHeight;
+      initialFallbackMessages.forEach(msg => renderChatMessage(msg));
     }
 
     function onChatBtnClick() {
@@ -2364,7 +2412,7 @@
       const drawer = document.getElementById('chatDrawer');
       const btn = document.getElementById('chatBtn');
       if (isChatOpen) {
-        renderInitialChat();
+        if (!chatsRef) renderInitialChat();
         drawer.classList.add('open');
         btn.style.color = 'var(--yellow)';
         if (window.innerWidth <= 768) {
@@ -2386,20 +2434,20 @@
       const txt = (input.value || '').trim();
       if (!txt) return;
 
-      const box = document.getElementById('chatMessages');
-      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const div = document.createElement('div');
-      div.className = 'chat-msg self';
-      div.innerHTML = `
-        <div class="chat-msg-meta">
-          <span class="chat-msg-user">${chatUserName} (You)</span>
-          <span>${now}</span>
-        </div>
-        <div class="chat-msg-text">${txt}</div>
-      `;
-      box.appendChild(div);
+      const now = Date.now();
+      const msgData = {
+        user: chatUserName || 'Nostalgic Listener',
+        text: txt,
+        timestamp: now,
+        timeStr: new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      if (chatsRef) {
+        chatsRef.push(msgData);
+      } else {
+        renderChatMessage(msgData);
+      }
       input.value = '';
-      box.scrollTop = box.scrollHeight;
     }
 
     // Keep window fixed at (0,0) when tapping text inputs on mobile iOS/Android
