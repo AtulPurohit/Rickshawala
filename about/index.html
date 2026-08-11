@@ -188,7 +188,24 @@
     }
 
     @media (max-width: 768px) {
-      .x-top-btn { display: none !important; }
+      .x-top-btn, .fullscreen-top-btn { display: none !important; }
+    }
+
+    .fullscreen-top-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.9);
+      padding: 0.3rem 0.5rem;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .fullscreen-top-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
     }
 
     /* CENTER ABOUT CARD */
@@ -399,6 +416,14 @@
             <polyline points="7 7 17 7 17 17"></polyline>
           </svg>
         </a>
+        <button class="fullscreen-top-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+          <svg id="fullscreenExpandIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+          <svg id="fullscreenCompressIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+            <path d="M4 14h6v6m10-10h-6V4m0 16v-6h6M3 10h6V4"/>
+          </svg>
+        </button>
       </div>
     </header>
 
@@ -465,6 +490,33 @@
 
   <!-- JavaScript for Live Clock, Firebase Counter, Horn -->
   <script>
+    // Fullscreen Toggle Engine
+    function toggleFullscreen() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) docEl.requestFullscreen();
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+        else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+      }
+    }
+
+    function updateFullscreenIcon() {
+      const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+      const exp = document.getElementById('fullscreenExpandIcon');
+      const comp = document.getElementById('fullscreenCompressIcon');
+      if (exp && comp) {
+        exp.style.display = isFS ? 'none' : 'block';
+        comp.style.display = isFS ? 'block' : 'none';
+      }
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
     // Live Clock
     const liveClockEl = document.getElementById('liveClock');
     function tickClock() {
