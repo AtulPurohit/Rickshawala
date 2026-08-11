@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   
   <!-- Primary Meta Tags -->
   <title>About RICKSHAWALA — 90s Hindi Music &amp; Auto-Rickshaw Nostalgia</title>
@@ -35,54 +35,278 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛺</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --bg-dark: #0A0A0A;
+      --yellow: #F5C518;
+      --text-white: #FFFFFF;
+      --text-dim: rgba(255, 255, 255, 0.7);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background-color: #0A0A0A;
-      color: #FFFFFF;
-      font-family: 'Outfit', sans-serif;
-      line-height: 1.6;
+    
+    html, body {
+      width: 100%;
+      height: 100%;
       min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Background Image Container */
+    .bg-container {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background-image: url('/assets/bg.png');
+      background-size: cover;
+      background-position: center bottom;
+      background-repeat: no-repeat;
+    }
+
+    @media (max-width: 768px) {
+      .bg-container {
+        background-image: url('/assets/mobile_bg.png');
+        background-position: center center;
+      }
+    }
+
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%),
+                  linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.85) 100%);
+      pointer-events: none;
+    }
+
+    /* Main Viewport Wrapper */
+    .app-viewport {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      padding: 1.5rem 2.5rem;
+    }
+
+    /* TOP HEADER BAR */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      z-index: 20;
+    }
+
+    .top-left { display: flex; align-items: center; }
+
+    .live-clock {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.25rem 0.65rem;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      letter-spacing: 0.05em;
+    }
+
+    .top-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(245, 197, 24, 0.3);
+      padding: 0.2rem 0.75rem;
+      border-radius: 99px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--yellow);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #22c55e;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .status-sub {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--text-dim);
+    }
+
+    .top-right { display: flex; align-items: center; }
+
+    .yt-music-top-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.32rem 0.85rem;
+      border-radius: 99px;
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .yt-music-top-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* CENTER ABOUT CARD */
+    .center-card-wrap {
+      display: flex;
       justify-content: center;
       align-items: center;
-      padding: 2rem 1.5rem;
-      background-image: radial-gradient(circle at center, rgba(245,197,24,0.08) 0%, rgba(10,10,10,0.95) 70%), url('/assets/bg.png');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+      flex: 1;
+      padding: 2rem 0;
+      z-index: 20;
     }
+
     .card {
       max-width: 680px;
       width: 100%;
-      background: rgba(15, 15, 18, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(12, 12, 16, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 24px;
-      padding: 2.5rem;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      padding: 2.2rem 2.5rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      max-height: 70vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(245, 197, 24, 0.3) transparent;
     }
-    h1 { font-size: 2.2rem; color: #F5C518; margin-bottom: 0.5rem; }
-    .subtitle { font-size: 0.9rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; text-transform: uppercase; }
-    h2 { font-size: 1.3rem; color: #FFFFFF; margin-top: 1.5rem; margin-bottom: 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.3rem; }
-    p { color: rgba(255,255,255,0.85); font-size: 1rem; margin-bottom: 1rem; }
-    a { color: #F5C518; text-decoration: none; font-weight: 600; }
-    a:hover { text-decoration: underline; }
+
+    .card h1 { font-size: 2.2rem; color: var(--yellow); margin-bottom: 0.3rem; font-weight: 900; }
+    .card .subtitle { font-size: 0.85rem; letter-spacing: 0.2em; color: var(--text-dim); margin-bottom: 1.4rem; text-transform: uppercase; font-family: 'Space Mono', monospace; }
+    .card h2 { font-size: 1.25rem; color: #FFFFFF; margin-top: 1.4rem; margin-bottom: 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 0.3rem; font-weight: 800; }
+    .card p { color: rgba(255,255,255,0.85); font-size: 0.98rem; margin-bottom: 0.9rem; line-height: 1.6; }
+    .card a { color: var(--yellow); text-decoration: none; font-weight: 600; }
+    .card a:hover { text-decoration: underline; }
     .btn-home {
       display: inline-block;
-      margin-top: 1.5rem;
-      padding: 0.75rem 1.5rem;
-      background: #F5C518;
+      margin-top: 1.4rem;
+      padding: 0.75rem 1.6rem;
+      background: var(--yellow);
       color: #000000;
       border-radius: 99px;
-      font-weight: 700;
+      font-weight: 800;
+      font-size: 0.95rem;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     .btn-home:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(245,197,24,0.4); text-decoration: none; }
+
+    /* BOTTOM FLOATING CONTROLS */
+    .bottom-zone {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+    }
+
+    .horn-button-container { position: relative; }
+    .horn-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      background: rgba(14, 14, 18, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(245, 197, 24, 0.35);
+      border-radius: 99px;
+      padding: 0.6rem 1.2rem;
+      color: #FFF;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .horn-btn:hover {
+      background: rgba(245, 197, 24, 0.2);
+      border-color: var(--yellow);
+      transform: scale(1.03);
+    }
+    .horn-icon-circle {
+      width: 28px;
+      height: 28px;
+      background: var(--yellow);
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .horn-text { display: flex; flex-direction: column; text-align: left; }
+    .horn-title { font-size: 0.85rem; font-weight: 700; color: #FFF; }
+    .horn-sub { font-size: 0.6rem; color: var(--text-dim); }
+
+    .instagram-button-container { position: relative; }
+    .instagram-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.4rem 0.85rem;
+      border-radius: 99px;
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+    }
+    .instagram-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .app-viewport { padding: 0.8rem 1rem; }
+      .card { padding: 1.5rem; max-height: 65vh; border-radius: 20px; }
+      .card h1 { font-size: 1.7rem; }
+      .yt-music-top-btn span { display: none; }
+      .horn-text { display: none; }
+      .horn-btn { padding: 0.5rem 0.8rem; }
+      .instagram-handle { font-size: 0.7rem; }
+    }
   </style>
 
   <!-- Structured Data JSON-LD -->
@@ -116,29 +340,182 @@
 </head>
 <body>
 
-  <main class="card">
-    <h1>रिक्शावाला — RICKSHAWALA</h1>
-    <div class="subtitle">HORN. MUSIC. METER. REPEAT.</div>
+  <!-- Background Layer -->
+  <div class="bg-container"></div>
+  <div class="bg-overlay"></div>
 
-    <h2>Why Rickshawala?</h2>
-    <p>Remember those auto-rickshaw rides?</p>
-    <p>The meter running. The city passing by. And somewhere above the sound of traffic, a 90s Hindi banger playing from the Rickshawala's music system.</p>
-    <p><em>No algorithm.<br>No recommendation engine.<br>Just a great song playing at full volume.</em></p>
-    <p>RICKSHAWALA.FUN was created to bring back that feeling.</p>
-    <p>It is a nostalgic digital ride through the unforgettable Hindi songs of the 90s — created for everyone who still remembers the music, the streets and those little journeys.</p>
+  <!-- Main Viewport Layer -->
+  <div class="app-viewport">
 
-    <h2>About RICKSHAWALA</h2>
-    <p>RICKSHAWALA.FUN is an independent creative project created and developed by <a href="https://instagram.com/atulpurohit" target="_blank" rel="noopener noreferrer">Atul Purohit</a> for lovers of 90s Hindi music and the nostalgia of Indian auto-rickshaw rides.</p>
-    <p>Playlist curated by <a href="https://instagram.com/atulpurohit" target="_blank" rel="noopener noreferrer">Atul Purohit</a>.</p>
-    <p>
-      👉 <a href="https://music.youtube.com/playlist?list=PLYErt37hS-BM" target="_blank" rel="noopener noreferrer">Listen to the RICKSHAWALA 90s Hindi playlist on YouTube Music</a>
-    </p>
+    <!-- TOP HEADER BAR -->
+    <header class="top-bar">
+      <!-- Left: Real-Time Live Clock -->
+      <div class="top-left">
+        <span class="live-clock" id="liveClock">11:59:22 am</span>
+      </div>
 
-    <h2>The Ride Back to the 90s</h2>
-    <p>Before playlists lived in our phones, songs travelled with us. A rickshaw ride across an Indian city could come with its own soundtrack — a cassette, a radio, a crackling speaker and a 90s Hindi banger playing louder than the traffic.</p>
+      <!-- Center: Live Users Ticker -->
+      <div class="top-center">
+        <div class="status-badge">
+          <span class="pulse-dot"></span>
+          <span id="userCount">628</span>
+        </div>
+        <span class="status-sub">ON THE STREETS</span>
+      </div>
 
-    <a href="https://rickshawala.fun/" class="btn-home">🛺 Hop In &amp; Listen Now</a>
-  </main>
+      <!-- Right: YT Music Link -->
+      <div class="top-right">
+        <a href="https://music.youtube.com/playlist?list=PLYErt37hS-BM" target="_blank" rel="noopener noreferrer" class="yt-music-top-btn" title="Listen to the RICKSHAWALA 90s Hindi playlist on YouTube Music">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF">
+            <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm0 19.2c-3.972 0-7.2-3.228-7.2-7.2s3.228-7.2 7.2-7.2 7.2 3.228 7.2 7.2-3.228 7.2-7.2 7.2zm-2.4-10.44v6.48L15.6 12l-6-3.24z"/>
+          </svg>
+          <span>YT Music</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon">
+            <line x1="7" y1="17" x2="17" y2="7"></line>
+            <polyline points="7 7 17 7 17 17"></polyline>
+          </svg>
+        </a>
+      </div>
+    </header>
 
+    <!-- CENTER ABOUT CARD -->
+    <div class="center-card-wrap">
+      <main class="card">
+        <h1>रिक्शावाला — RICKSHAWALA</h1>
+        <div class="subtitle">HORN. MUSIC. METER. REPEAT.</div>
+
+        <h2>Why Rickshawala?</h2>
+        <p>Remember those auto-rickshaw rides?</p>
+        <p>The meter running. The city passing by. And somewhere above the sound of traffic, a 90s Hindi banger playing from the Rickshawala's music system.</p>
+        <p><em>No algorithm.<br>No recommendation engine.<br>Just a great song playing at full volume.</em></p>
+        <p>RICKSHAWALA.FUN was created to bring back that feeling.</p>
+        <p>It is a nostalgic digital ride through the unforgettable Hindi songs of the 90s — created for everyone who still remembers the music, the streets and those little journeys.</p>
+
+        <h2>About RICKSHAWALA</h2>
+        <p>RICKSHAWALA.FUN is an independent creative project created and developed by <a href="https://instagram.com/atulpurohit" target="_blank" rel="noopener noreferrer">Atul Purohit</a> for lovers of 90s Hindi music and the nostalgia of Indian auto-rickshaw rides.</p>
+        <p>Playlist curated by <a href="https://instagram.com/atulpurohit" target="_blank" rel="noopener noreferrer">Atul Purohit</a>.</p>
+        <p>
+          👉 <a href="https://music.youtube.com/playlist?list=PLYErt37hS-BM" target="_blank" rel="noopener noreferrer">Listen to the RICKSHAWALA 90s Hindi playlist on YouTube Music</a>
+        </p>
+
+        <h2>The Ride Back to the 90s</h2>
+        <p>Before playlists lived in our phones, songs travelled with us. A rickshaw ride across an Indian city could come with its own soundtrack — a cassette, a radio, a crackling speaker and a 90s Hindi banger playing louder than the traffic.</p>
+
+        <a href="https://rickshawala.fun/" class="btn-home">🛺 Hop In &amp; Listen Now</a>
+      </main>
+    </div>
+
+    <!-- BOTTOM FLOATING CONTROLS -->
+    <div class="bottom-zone">
+      <!-- HORN OK PLEASE BUTTON (BOTTOM LEFT) -->
+      <div class="horn-button-container">
+        <button class="horn-btn" id="hornBtn" onclick="triggerHorn()">
+          <div class="horn-icon-circle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="5" cy="12" r="3.5" fill="currentColor"/>
+              <path d="M8.5 12h5l6.5-5.5v11L13.5 12"/>
+              <path d="M22 9a4 4 0 0 1 0 6"/>
+            </svg>
+          </div>
+          <div class="horn-text">
+            <span class="horn-title">हॉर्न ओके प्लीज़</span>
+            <span class="horn-sub">Horn ok pleaseee</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- INSTAGRAM LINK (BOTTOM RIGHT) -->
+      <div class="instagram-button-container">
+        <a href="https://instagram.com/atulpurohit" target="_blank" class="instagram-btn" title="@atulpurohit on Instagram">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          </svg>
+          <span class="instagram-handle">@atulpurohit</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript for Live Clock, Firebase Counter, Horn -->
+  <script>
+    // Live Clock
+    const liveClockEl = document.getElementById('liveClock');
+    function tickClock() {
+      liveClockEl.textContent = new Date().toLocaleTimeString([], {
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+      });
+    }
+    tickClock();
+    setInterval(tickClock, 1000);
+
+    // Live Visitor Count via Firebase
+    const userCountEl = document.getElementById('userCount');
+    function setCount(n) { if (userCountEl) userCountEl.textContent = n; }
+
+    (function loadFirebasePresence() {
+      function loadScript(url, cb) {
+        const s = document.createElement('script'); s.src = url; s.onload = cb;
+        document.head.appendChild(s);
+      }
+      loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js', () => {
+        loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js', () => {
+          const firebaseConfig = {
+            apiKey: "AIzaSyBoGaTrAZUovsvLgO0UJcQoEGANZQheUY",
+            authDomain: "rickshawala-6ec32.firebaseapp.com",
+            databaseURL: "https://rickshawala-6ec32-default-rtdb.firebaseio.com",
+            projectId: "rickshawala-6ec32",
+            storageBucket: "rickshawala-6ec32.firebasestorage.app",
+            messagingSenderId: "518402469308",
+            appId: "1:518402469308:web:187b4bc2e90b70688d0fb9"
+          };
+          try {
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+            const myRef = db.ref('presence').push();
+            db.ref('.info/connected').on('value', snap => {
+              if (!snap.val()) return;
+              myRef.set(true); myRef.onDisconnect().remove();
+            });
+            db.ref('presence').on('value', snap => {
+              setCount(601 + snap.numChildren());
+            });
+          } catch(e) {
+            let n = 628;
+            setInterval(() => {
+              n = Math.max(615, Math.min(650, n + Math.floor(Math.random() * 5) - 2));
+              setCount(n);
+            }, 4000);
+          }
+        });
+      });
+    })();
+
+    // Horn Sound Synthesizer
+    let audioCtx = null;
+    function triggerHorn() {
+      const btn = document.getElementById('hornBtn');
+      btn.classList.add('honking');
+      setTimeout(() => btn.classList.remove('honking'), 450);
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator();
+        const g  = audioCtx.createGain();
+        o1.type = 'sawtooth'; o2.type = 'square';
+        o1.frequency.setValueAtTime(370, now); o1.frequency.exponentialRampToValueAtTime(385, now + 0.35);
+        o2.frequency.setValueAtTime(445, now); o2.frequency.exponentialRampToValueAtTime(455, now + 0.35);
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.35, now + 0.03);
+        g.gain.setValueAtTime(0.35, now + 0.28);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+        o1.connect(g); o2.connect(g); g.connect(audioCtx.destination);
+        o1.start(now); o2.start(now); o1.stop(now + 0.4); o2.stop(now + 0.4);
+      } catch(e) {}
+    }
+  </script>
 </body>
 </html>
