@@ -1394,9 +1394,31 @@
       .playlist-items { max-height: 240px; }
       .item-title { max-width: 160px; }
 
-      /* Chat drawer: full width on mobile */
-      .chat-drawer { width: 100vw; left: -100vw; }
-      .chat-drawer.open { left: 0; }
+      /* Chat drawer: fixed non-moveable viewport overlay on mobile */
+      .chat-drawer {
+        width: 100vw;
+        left: -100vw;
+        height: 100dvh;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        overflow: hidden !important;
+        touch-action: manipulation;
+      }
+
+      .chat-drawer.open {
+        left: 0;
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+        touch-action: manipulation;
+        overscroll-behavior: contain;
+      }
     }
 
     /* ═══════════════════════════════════════════════
@@ -2327,9 +2349,17 @@
         renderInitialChat();
         drawer.classList.add('open');
         btn.style.color = 'var(--yellow)';
+        if (window.innerWidth <= 768) {
+          document.body.style.overflow = 'hidden';
+          document.body.style.touchAction = 'none';
+        }
       } else {
         drawer.classList.remove('open');
         btn.style.color = '';
+        if (window.innerWidth <= 768) {
+          document.body.style.overflow = '';
+          document.body.style.touchAction = '';
+        }
       }
     }
 
