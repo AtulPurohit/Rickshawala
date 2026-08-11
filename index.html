@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>RICKSHAWALA — Horn. Music. Meter. Repeat.</title>
   
   <!-- Favicon -->
@@ -58,6 +58,18 @@
       .bg-container {
         background-image: url('./assets/mobile_bg.png');
         background-position: center center;
+      }
+
+      /* Fix Safari mobile: 100dvh excludes browser chrome (address bar + bottom bar) */
+      .chat-drawer {
+        height: 100dvh;
+        /* fallback for browsers without dvh support */
+        height: calc(var(--vh, 1vh) * 100);
+      }
+
+      /* Push input above Safari bottom toolbar using safe-area-inset */
+      .chat-input-row {
+        padding-bottom: calc(0.8rem + env(safe-area-inset-bottom, 0px));
       }
     }
 
@@ -1751,6 +1763,12 @@
     }
     tickClock();
     setInterval(tickClock, 1000);
+
+    // Safari 100vh fix: set --vh to actual inner height (excludes browser chrome)
+    function setVH() { document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
+    setVH();
+    window.addEventListener('resize', setVH);
+    window.addEventListener('orientationchange', setVH);
 
     // ── Real-time visitor count via Firebase RTDB presence ──
     const userCountEl = document.getElementById('userCount');
