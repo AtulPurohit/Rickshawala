@@ -2274,10 +2274,10 @@
 
     // ── Real-time visitor count via Firebase RTDB presence ──
     const userCountEl = document.getElementById('userCount');
-    const chatOnlineBadge = document.getElementById('chatOnlineBadge');
+    const chatUserCountEl = document.getElementById('chatUserCount');
     function setCount(n) {
-      userCountEl.textContent = n;
-      if (chatOnlineBadge) chatOnlineBadge.textContent = `${n} listening live`;
+      if (userCountEl) userCountEl.textContent = n;
+      if (chatUserCountEl) chatUserCountEl.textContent = n;
     }
     (function loadFirebasePresence() {
       function loadScript(url, cb) {
@@ -2498,7 +2498,7 @@
         <span class="chat-title-text">💬 LIVE CHAT ROOM</span>
         <div class="chat-online-badge-wrap" style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.15rem;">
           <span class="pulse-dot"></span>
-          <span class="chat-online-badge" id="chatOnlineBadge" style="color: #4ade80; font-size: 0.72rem; font-weight: 600;">628 listening live</span>
+          <span class="chat-online-badge" id="chatOnlineBadge" style="color: #4ade80; font-size: 0.70rem; font-weight: 400; opacity: 0.95;"><span id="chatUserCount">628</span> listening live</span>
         </div>
       </div>
       <span class="close-chat" onclick="toggleChat()">✕</span>
