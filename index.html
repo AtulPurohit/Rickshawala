@@ -1150,6 +1150,7 @@
       border-radius: 99px;
       pointer-events: none;
       box-shadow: 0 0 6px rgba(245, 197, 24, 0.5);
+      transition: width 0.1s linear;
     }
 
     .progress-handle {
@@ -1160,7 +1161,7 @@
       font-size: 1.25rem;
       line-height: 1;
       pointer-events: none;
-      transition: transform 0.15s ease-out;
+      transition: left 0.1s linear, transform 0.15s ease-out;
       filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
       user-select: none;
       cursor: pointer;
@@ -1168,6 +1169,16 @@
 
     .progress-bar-track:hover .progress-handle {
       transform: translate(-50%, -48%) scaleX(-1) scale(1.25);
+    }
+
+    .progress-bar-track.is-dragging .progress-fill,
+    .progress-bar-track.is-dragging .progress-handle {
+      transition: none !important;
+    }
+
+    .progress-handle.is-dragging {
+      transform: translate(-50%, -48%) scaleX(-1) scale(1.38) !important;
+      filter: drop-shadow(0 5px 14px rgba(245, 197, 24, 0.95)) !important;
     }
 
     /* Player Controls Right */
@@ -1654,7 +1665,7 @@
 
             <div class="scrubber-row">
               <span id="currentTime">00:00</span>
-              <div class="progress-bar-track" onclick="seekTrack(event)" ontouchstart="seekTrack(event)" ontouchmove="seekTrack(event)">
+              <div class="progress-bar-track" id="progressBarTrack">
                 <div class="progress-fill" id="progressFill"></div>
                 <div class="progress-handle" id="progressHandle">🛺</div>
               </div>
@@ -1965,25 +1976,12 @@
       return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
-    function updateScrubber() {
-      if (!ytReady || !isPlaying) return;
-      try {
-        const cur = ytPlayer.getCurrentTime() || 0;
-        const dur = ytPlayer.getDuration() || 1;
-        const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
-        progressFill.style.width  = pct + '%';
-        progressHandle.style.left = pct + '%';
-        currentTimeEl.textContent = formatTime(cur);
-        if (dur > 0) durationTimeEl.textContent = formatTime(dur);
-      } catch(_) {}
-    }
-
     function startScrubberTick() {
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(updateScrubber, 400);
     }
 
-    // ── Track loading (UI only — playback via playVideoAt in selectTrackFromList) ──
+    // ── Track loading ──
     function loadTrack(idx) {
       currentTrackIdx = idx;
       const track = PLAYLIST[idx];
@@ -1995,7 +1993,6 @@
       progressHandle.style.left  = '0%';
 
       discImg.style.display = 'block';
-      // Show cached ytId thumbnail if available, else default cover
       discImg.src = track.ytId ? `https://i.ytimg.com/vi/${track.ytId}/hqdefault.jpg` : DEFAULT_COVER;
       discImg.onerror = function() { this.src = DEFAULT_COVER; };
 
@@ -2024,12 +2021,11 @@
       trackTitle.textContent     = track.title;
       trackArtist.textContent    = track.artist;
       durationTimeEl.textContent = track.duration;
-      // Show cached thumbnail if known, else default until song plays and getVideoData() updates it
       discImg.src = track.ytId ? `https://i.ytimg.com/vi/${track.ytId}/hqdefault.jpg` : DEFAULT_COVER;
       discImg.onerror = function() { this.src = DEFAULT_COVER; };
 
       if (ytReady && ytPlayer.playVideoAt) {
-        ytPlayer.playVideoAt(idx); // playlist-mode: correct song, correct order
+        ytPlayer.playVideoAt(idx);
       }
       renderPlaylist();
       if (isPlaylistOpen) togglePlaylist();
@@ -2078,36 +2074,85 @@
       volOffIcon.style.display = isMuted ? 'block' : 'none';
     }
 
-    // ── Scrubber seek ──
-    function seekToPercent(pct) {
-      if (!ytReady) return;
-      const dur = ytPlayer.getDuration() || 0;
-      ytPlayer.seekTo(pct * dur, true);
-      updateScrubber();
+    // ── Scrubber Engine ──
+    let isDraggingScrubber = false;
+
+    function updateScrubber() {
+      if (!ytReady || !isPlaying || isDraggingScrubber) return;
+      try {
+        const cur = ytPlayer.getCurrentTime() || 0;
+        const dur = ytPlayer.getDuration() || 1;
+        const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
+        progressFill.style.width  = pct + '%';
+        progressHandle.style.left = pct + '%';
+        currentTimeEl.textContent = formatTime(cur);
+        if (dur > 0) durationTimeEl.textContent = formatTime(dur);
+      } catch(_) {}
     }
 
-    function seekTrack(e) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      seekToPercent(Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)));
-    }
-
-    // Draggable scrubber
+    // Ultra-Smooth 60FPS Draggable Scrubber with Pointer & Touch Events
     (() => {
-      const bar = document.getElementById('progressFill').parentElement;
-      let dragging = false;
-      const drag = e => {
-        if (!dragging) return;
+      const bar = document.getElementById('progressBarTrack');
+      let dragPct = 0;
+
+      function getPctFromEvent(e) {
         const rect = bar.getBoundingClientRect();
-        const x = e.touches ? e.touches[0].clientX : e.clientX;
-        seekToPercent(Math.max(0, Math.min(1, (x - rect.left) / rect.width)));
-      };
-      bar.addEventListener('mousedown',  e => { dragging = true; drag(e); });
-      bar.addEventListener('touchstart', e => { dragging = true; drag(e); }, { passive: true });
-      document.addEventListener('mousemove',  drag);
-      document.addEventListener('touchmove',  drag, { passive: true });
-      document.addEventListener('mouseup',    () => { dragging = false; });
-      document.addEventListener('touchend',   () => { dragging = false; });
+        const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : (e.clientX !== undefined ? e.clientX : rect.left);
+        return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      }
+
+      function updateUIForPct(pct) {
+        dragPct = pct;
+        const pctString = (pct * 100).toFixed(2) + '%';
+        progressFill.style.width = pctString;
+        progressHandle.style.left = pctString;
+        if (ytReady && ytPlayer.getDuration) {
+          const dur = ytPlayer.getDuration() || 0;
+          if (dur > 0) currentTimeEl.textContent = formatTime(pct * dur);
+        }
+      }
+
+      function onDragStart(e) {
+        isDraggingScrubber = true;
+        bar.classList.add('is-dragging');
+        progressHandle.classList.add('is-dragging');
+        updateUIForPct(getPctFromEvent(e));
+      }
+
+      function onDragMove(e) {
+        if (!isDraggingScrubber) return;
+        requestAnimationFrame(() => {
+          if (isDraggingScrubber) updateUIForPct(getPctFromEvent(e));
+        });
+      }
+
+      function onDragEnd() {
+        if (!isDraggingScrubber) return;
+        isDraggingScrubber = false;
+        bar.classList.remove('is-dragging');
+        progressHandle.classList.remove('is-dragging');
+
+        // Execute YouTube seek ONCE when user releases handle
+        if (ytReady && ytPlayer.getDuration) {
+          const dur = ytPlayer.getDuration() || 0;
+          try {
+            ytPlayer.seekTo(dragPct * dur, true);
+          } catch (_) {}
+        }
+      }
+
+      // Universal Pointer & Touch & Mouse event bindings
+      bar.addEventListener('pointerdown', e => {
+        try { bar.setPointerCapture(e.pointerId); } catch (_) {}
+        onDragStart(e);
+      });
+      bar.addEventListener('pointermove', onDragMove);
+      bar.addEventListener('pointerup', onDragEnd);
+      bar.addEventListener('pointercancel', onDragEnd);
+
+      bar.addEventListener('touchstart', e => { onDragStart(e); }, { passive: true });
+      window.addEventListener('touchmove', e => { if (isDraggingScrubber) onDragMove(e); }, { passive: true });
+      window.addEventListener('touchend', onDragEnd);
     })();
 
     // ── Playlist drawer ──
