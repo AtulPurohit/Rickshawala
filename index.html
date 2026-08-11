@@ -2273,9 +2273,9 @@
     // ── Real-time clock ──
 
     // ── Real-time visitor count via Firebase RTDB presence ──
-    const userCountEl = document.getElementById('userCount');
-    const chatUserCountEl = document.getElementById('chatUserCount');
     function setCount(n) {
+      const userCountEl = document.getElementById('userCount');
+      const chatUserCountEl = document.getElementById('chatUserCount');
       if (userCountEl) userCountEl.textContent = n;
       if (chatUserCountEl) chatUserCountEl.textContent = n;
     }
