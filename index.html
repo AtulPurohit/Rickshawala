@@ -540,17 +540,22 @@
 
     .music-player-card {
       width: 100%;
-      background: rgba(18, 18, 22, 0.88);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 9999px;
-      padding: 1.25rem 1.8rem;
+      background: rgba(10, 10, 14, 0.72);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.18); /* brighter top edge = glass shelf */
+      border-radius: 28px;
+      padding: 1.1rem 1.4rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1.2rem;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.1);
+      gap: 1rem;
+      box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.7),
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
     }
 
     /* Left Side Live Chat Drawer */
@@ -768,22 +773,24 @@
       cursor: pointer;
     }
 
-    /* Album Art / Full Cover Thumbnail (Rotating) */
+    /* Album Art — square with rounded corners, like image 2 */
     .album-art-wrap {
       position: relative;
-      width: 48px;
-      height: 48px;
+      width: 54px;
+      height: 54px;
       flex-shrink: 0;
     }
 
     .vinyl-disc {
       width: 100%;
       height: 100%;
-      border-radius: 50%;
-      border: 2px solid var(--yellow);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      border-radius: 12px;  /* square-ish rounded corners, not a circle */
+      border: none;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        0 6px 20px rgba(0, 0, 0, 0.7),
+        0 0 12px rgba(245, 197, 24, 0.2);
       overflow: hidden;
-      transition: transform 0.3s;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -794,7 +801,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 50%;
+      border-radius: 12px;
       display: block;
     }
 
@@ -917,9 +924,9 @@
 
     .progress-bar-track {
       flex: 1;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 99px;
       position: relative;
       cursor: grab;
       touch-action: none;
@@ -933,9 +940,10 @@
       left: 0;
       height: 100%;
       width: 0%;
-      background: var(--yellow);
-      border-radius: 4px;
+      background: linear-gradient(90deg, rgba(245,197,24,0.8), var(--yellow));
+      border-radius: 99px;
       pointer-events: none;
+      box-shadow: 0 0 6px rgba(245, 197, 24, 0.5);
     }
 
     .progress-handle {
@@ -1076,12 +1084,12 @@
       .horn-sub { font-size: 0.58rem; }
       .horn-icon-circle { width: 26px; height: 26px; }
 
-      /* Player card: pill → rounded rectangle on small screens */
+      /* Player card: glass rounded rectangle on small screens */
       .music-player-card {
-        border-radius: 20px;
-        padding: 0.9rem 1rem;
-        gap: 0.75rem;
-        flex-wrap: wrap;
+        border-radius: 24px;
+        padding: 0.85rem 1rem;
+        gap: 0.65rem;
+        flex-wrap: nowrap;
       }
 
       /* Playlist popover: full width */
