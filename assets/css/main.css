@@ -1093,6 +1093,129 @@
       }
     }
 
+    /* ── About Page Layout & Card Styles ── */
+    body.about-page {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-y: auto !important;
+    }
+
+    body.about-page .app-viewport {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      min-height: 100dvh;
+      height: auto !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.2rem 2.5rem;
+      box-sizing: border-box;
+      overflow: visible !important;
+    }
+
+    .center-card-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      padding: 2rem 0;
+      z-index: 20;
+      width: 100%;
+    }
+
+    .card {
+      max-width: 740px;
+      width: 100%;
+      background: rgba(12, 12, 16, 0.92);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(245, 197, 24, 0.3);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+      margin: 1rem 0;
+    }
+
+    .card h1 {
+      font-size: 2.2rem;
+      color: var(--yellow);
+      margin-bottom: 0.3rem;
+      font-weight: 900;
+    }
+
+    .card .subtitle {
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      margin-bottom: 1.4rem;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      color: #FFFFFF;
+      margin-top: 1.4rem;
+      margin-bottom: 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 0.3rem;
+      font-weight: 800;
+    }
+
+    .card p {
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 0.98rem;
+      margin-bottom: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .card a {
+      color: var(--yellow);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .card a:hover {
+      text-decoration: underline;
+    }
+
+    .card a.btn-home {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.4rem;
+      margin-bottom: 0.5rem;
+      padding: 0.8rem 1.8rem;
+      background: var(--yellow);
+      color: #000000 !important;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 20px rgba(245, 197, 24, 0.35);
+    }
+
+    .card a.btn-home:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(245, 197, 24, 0.5);
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      body.about-page .app-viewport {
+        padding: 1rem;
+      }
+      .card {
+        padding: 1.5rem 1.2rem;
+        border-radius: 16px;
+      }
+      .card h1 {
+        font-size: 1.75rem;
+      }
+    }
+
     .chat-messages {
       flex: 1;
       overflow-y: auto;
