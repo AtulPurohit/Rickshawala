@@ -472,6 +472,8 @@
       flex-direction: column;
       align-items: center;
       margin-bottom: 15px;
+      z-index: 60;
+      pointer-events: auto !important;
     }
 
     /* Playlist Popover Menu */
@@ -480,22 +482,23 @@
       bottom: calc(100% + 12px);
       right: 0;
       width: 420px;
-      background: rgba(10, 10, 14, 0.72);
+      background: rgba(10, 10, 14, 0.88);
       backdrop-filter: blur(40px) saturate(180%);
       -webkit-backdrop-filter: blur(40px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-top: 1px solid rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
       border-radius: 20px;
       padding: 1rem;
       box-shadow:
-        0 24px 48px rgba(0, 0, 0, 0.7),
-        0 8px 20px rgba(0, 0, 0, 0.5),
+        0 24px 48px rgba(0, 0, 0, 0.85),
+        0 8px 20px rgba(0, 0, 0, 0.6),
         inset 0 1px 0 rgba(255, 255, 255, 0.12),
         inset 0 -1px 0 rgba(0, 0, 0, 0.3);
       display: none;
       flex-direction: column;
       gap: 0.8rem;
-      z-index: 100;
+      z-index: 150 !important;
+      pointer-events: auto !important;
       animation: popUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -562,6 +565,7 @@
       font-family: 'Outfit', sans-serif;
       width: 100%;
       caret-color: var(--yellow);
+      pointer-events: auto !important;
     }
 
     .playlist-search input::placeholder {
@@ -631,9 +635,11 @@
       flex-direction: column;
       gap: 0.4rem;
       max-height: 360px;
-      overflow-y: auto;
+      overflow-y: auto !important;
+      pointer-events: auto !important;
+      touch-action: pan-y !important;
       scrollbar-width: thin;
-      scrollbar-color: rgba(245, 197, 24, 0.3) transparent;
+      scrollbar-color: rgba(245, 197, 24, 0.4) transparent;
     }
 
     .playlist-items::-webkit-scrollbar {
@@ -658,6 +664,7 @@
       cursor: pointer;
       background: rgba(255, 255, 255, 0.03);
       transition: background 0.2s, transform 0.15s;
+      pointer-events: auto !important;
     }
 
     .playlist-item:hover {
