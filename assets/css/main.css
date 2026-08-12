@@ -1026,8 +1026,8 @@
     /* Mechanical Flag Lever */
     .meter-lever-wrap {
       position: absolute;
-      right: -28px;
-      top: 38px;
+      right: -32px;
+      top: 12px;
       width: 32px;
       height: 50px;
       cursor: pointer;
