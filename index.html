@@ -444,6 +444,37 @@
     <div id="ytPlayer"></div>
   </div>
 
+  <!-- Left Side Live Chat Drawer -->
+  <div class="chat-drawer" id="chatDrawer">
+    <div class="chat-header">
+      <div class="chat-header-title">
+        <span class="chat-title-text">💬 LIVE CHAT ROOM</span>
+        <div class="chat-online-badge-wrap" style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.15rem;">
+          <span class="pulse-dot"></span>
+          <span class="chat-online-badge" id="chatOnlineBadge" style="color: #4ade80; font-size: 0.70rem; font-weight: 400; opacity: 0.95;"><span id="chatUserCount">628</span> listening live</span>
+        </div>
+      </div>
+      <span class="close-chat" onclick="toggleChat()">✕</span>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+      <button id="sendChatBtn" onclick="sendChatMessage()" title="Send">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Name Prompt Modal: click-outside-to-close on mobile -->
+  <div class="name-modal-overlay" id="nameModalOverlay" onclick="if(event.target===this) this.style.display='none'">
+    <div class="name-modal-card">
+      <h3>🛺 Rickshawala Live Chat</h3>
+      <p>Enter your name to talk with live listeners on the street!</p>
+      <input type="text" id="userNameInput" placeholder="Enter your name (e.g. Rahul)..." onkeydown="if(event.key==='Enter') saveNameAndJoin()">
+      <button onclick="saveNameAndJoin()">Join Chat Room 🚀</button>
+    </div>
+  </div>
+
   <!-- YouTube IFrame API -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
