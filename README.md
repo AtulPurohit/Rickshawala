@@ -29,19 +29,19 @@ A rickshaw ride across an Indian city came with its own soundtrack — a cassett
 <table>
   <tr>
     <td align="center">
-      <img src="./assets/preview01.png" width="100%" alt="RICKSHAWALA Home - Music Player">
+      <img src="https://raw.githubusercontent.com/AtulPurohit/Rickshawala/main/assets/preview01.png" width="100%" alt="RICKSHAWALA Home - Music Player">
       <br><sub><b>🎵 Home — Immersive Music Player</b></sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="./assets/preview02.png" width="100%" alt="RICKSHAWALA Live Chat Room">
+      <img src="https://raw.githubusercontent.com/AtulPurohit/Rickshawala/main/assets/preview02.png" width="100%" alt="RICKSHAWALA Live Chat Room">
       <br><sub><b>💬 Live Chat Room — Talk with listeners</b></sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="./assets/preview03.png" width="100%" alt="RICKSHAWALA About Page">
+      <img src="https://raw.githubusercontent.com/AtulPurohit/Rickshawala/main/assets/preview03.png" width="100%" alt="RICKSHAWALA About Page">
       <br><sub><b>ℹ️ About Page — The story behind the ride</b></sub>
     </td>
   </tr>
