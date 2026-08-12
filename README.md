@@ -102,7 +102,7 @@ rickshawala.fun/
 
 ## 🎸 The Playlist
 
-24+ hand-picked 90s Hindi bangers including:
+100+ hand-picked 90s Hindi bangers including:
 
 - **Altaf Raja** — Pehle to Kabhi Kabhi, Tum To Thehre Pardesi
 - **Kumar Sanu** — Ek Sanam Chahiye Aashiqui Ke Liye, Ye Kaali Kaali Aankhen
