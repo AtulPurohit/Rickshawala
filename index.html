@@ -41,8 +41,10 @@
   <meta name="color-scheme" content="dark">
   <meta name="application-name" content="RICKSHAWALA.FUN">
 
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛺</text></svg>">
+  <!-- Favicon: proper PNG files for Google Search & all browsers -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
   
   <!-- Preconnect & Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -452,11 +454,15 @@
       gap: 1rem;
     }
 
-    /* Horn Button (Bottom Left floating pill) */
+    /* Horn + Live Chat Float (Bottom Left stack) */
     .horn-button-container {
       position: absolute;
       left: 0;
       bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.55rem;
     }
 
     .horn-btn {
@@ -650,6 +656,100 @@
 
     .close-playlist:hover {
       color: #fff;
+    }
+
+    /* Playlist search input */
+    .playlist-search {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 0.45rem 0.75rem;
+      transition: border-color 0.2s;
+    }
+
+    .playlist-search:focus-within {
+      border-color: rgba(245, 197, 24, 0.5);
+    }
+
+    .playlist-search svg {
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+
+    .playlist-search input {
+      background: none;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 0.8rem;
+      font-family: 'Outfit', sans-serif;
+      width: 100%;
+      caret-color: var(--yellow);
+    }
+
+    .playlist-search input::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    /* Web-only Live Chat Float Button (above Horn) */
+    .live-chat-float {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(20, 20, 24, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      position: relative;
+    }
+
+    .live-chat-float:hover {
+      background: rgba(35, 35, 42, 0.9);
+      border-color: rgba(74, 222, 128, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(74, 222, 128, 0.2);
+      color: #fff;
+    }
+
+    .live-chat-float .chat-float-dot {
+      width: 8px;
+      height: 8px;
+      background: #4ade80;
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pulse-green 1.8s ease-in-out infinite;
+    }
+
+    .live-chat-float .chat-float-badge {
+      display: none;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.1rem 0.38rem;
+      border-radius: 99px;
+      line-height: 1.4;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .live-chat-float .chat-float-badge.visible {
+      display: inline-block;
+    }
+    @media (max-width: 768px) {
+      .live-chat-float { display: none !important; }
     }
 
     .playlist-items {
@@ -1697,6 +1797,12 @@
 
       <!-- HORN OK PLEASE BUTTON (BOTTOM LEFT FLOATING) -->
       <div class="horn-button-container">
+        <button class="live-chat-float" id="liveChatFloatBtn" onclick="onChatBtnClick()" title="Open Live Chat Room">
+          <span class="chat-float-dot"></span>
+          <span>Live Chat</span>
+          <span class="chat-float-badge" id="chatMsgBadge"></span>
+        </button>
+
         <button class="horn-btn" id="hornBtn" onclick="triggerHorn()">
           <div class="horn-icon-circle">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1728,10 +1834,19 @@
       <div class="player-wrapper">
         
         <!-- PLAYLIST POPOVER MODAL -->
+        <!-- Backdrop: tapping outside closes playlist on mobile -->
+        <div id="playlistBackdrop" onclick="if(isPlaylistOpen) togglePlaylist()" style="display:none;position:fixed;inset:0;z-index:99;"></div>
         <div class="playlist-popover" id="playlistPopover">
           <div class="playlist-header">
             <span>🛺 RICKSHAWALA YT MUSIC</span>
             <span class="close-playlist" onclick="togglePlaylist()">✕</span>
+          </div>
+          <!-- Search Field -->
+          <div class="playlist-search">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="playlistSearchInput" placeholder="Search songs or artists..." oninput="filterPlaylist(this.value)" autocomplete="off" spellcheck="false">
           </div>
           <div class="playlist-items" id="playlistItems">
             <!-- Rendered by JS -->
@@ -2258,10 +2373,27 @@
       window.addEventListener('touchend', onDragEnd);
     })();
 
+    // ── Playlist filtering ──
+    let playlistFilter = '';
+    function filterPlaylist(query) {
+      playlistFilter = query.toLowerCase().trim();
+      renderPlaylist();
+    }
+
     // ── Playlist drawer ──
     function renderPlaylist() {
       playlistItems.innerHTML = '';
-      PLAYLIST.forEach((track, i) => {
+      const filtered = playlistFilter
+        ? PLAYLIST.filter(t => t.title.toLowerCase().includes(playlistFilter) || t.artist.toLowerCase().includes(playlistFilter))
+        : PLAYLIST;
+
+      if (filtered.length === 0) {
+        playlistItems.innerHTML = `<div style="text-align:center;padding:1.5rem 0;color:rgba(255,255,255,0.35);font-size:0.78rem;">No songs found</div>`;
+        return;
+      }
+
+      filtered.forEach((track) => {
+        const i = PLAYLIST.indexOf(track);
         const item = document.createElement('div');
         item.className = `playlist-item ${i === currentTrackIdx ? 'active' : ''}`;
         item.onclick = () => selectTrackFromList(i);
@@ -2283,8 +2415,21 @@
 
     function togglePlaylist() {
       isPlaylistOpen = !isPlaylistOpen;
-      if (isPlaylistOpen) { renderPlaylist(); playlistPopover.classList.add('open'); }
-      else playlistPopover.classList.remove('open');
+      const backdrop = document.getElementById('playlistBackdrop');
+      if (isPlaylistOpen) {
+        renderPlaylist();
+        playlistPopover.classList.add('open');
+        if (backdrop) backdrop.style.display = 'block';
+        // Focus search input
+        setTimeout(() => { const s = document.getElementById('playlistSearchInput'); if (s) s.focus(); }, 50);
+      } else {
+        playlistPopover.classList.remove('open');
+        if (backdrop) backdrop.style.display = 'none';
+        // Clear search on close
+        playlistFilter = '';
+        const s = document.getElementById('playlistSearchInput');
+        if (s) s.value = '';
+      }
     }
 
     // ── Horn sound (Web Audio, no change) ──
@@ -2421,14 +2566,28 @@
       try {
         chatsRef = db.ref('chats');
         const now = Date.now();
-        const cutoff24h = now - (24 * 60 * 60 * 1000); // 24 Hours in ms
+        const cutoff24h = now - (24 * 60 * 60 * 1000);
 
-        // Clean up messages older than 24 hours from database
+        // Clean up messages older than 24 hours
         chatsRef.orderByChild('timestamp').endAt(cutoff24h).once('value', snap => {
           snap.forEach(child => { child.ref.remove(); });
         });
 
-        // Listen for new incoming real-time messages (within last 24 hours)
+        // 24h message count for the chat badge
+        chatsRef.orderByChild('timestamp').startAt(cutoff24h).on('value', snap => {
+          const count = snap.numChildren();
+          const badge = document.getElementById('chatMsgBadge');
+          if (badge) {
+            if (count > 0 && !isChatOpen) {
+              badge.textContent = count > 99 ? '99+' : count;
+              badge.classList.add('visible');
+            } else {
+              badge.classList.remove('visible');
+            }
+          }
+        });
+
+        // Listen for new messages within last 24h
         chatsRef.orderByChild('timestamp').startAt(cutoff24h).on('child_added', snapshot => {
           const msg = snapshot.val();
           if (msg && msg.timestamp >= cutoff24h) {
@@ -2501,6 +2660,9 @@
         if (!chatsRef) renderInitialChat();
         drawer.classList.add('open');
         btn.style.color = 'var(--yellow)';
+        // Hide the float badge when chat is open
+        const badge = document.getElementById('chatMsgBadge');
+        if (badge) badge.classList.remove('visible');
         if (window.innerWidth <= 768) {
           document.body.style.overflow = 'hidden';
           document.body.style.touchAction = 'none';
