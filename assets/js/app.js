@@ -787,3 +787,150 @@
         window.open(webUrl, '_blank');
       }
     }
+
+    // ── Auto-Rickshaw Fare Meter Engine ──
+    const METER_STORAGE_KEY = 'rickshawala_meter_session';
+    let isMeterHired = false;
+    let meterSeconds = 0;
+    let meterDistance = 0.00;
+    let meterFare = 23.00;
+    let meterInterval = null;
+
+    function saveMeterSession() {
+      try {
+        localStorage.setItem(METER_STORAGE_KEY, JSON.stringify({
+          isHired: isMeterHired,
+          seconds: meterSeconds,
+          distance: meterDistance,
+          fare: meterFare
+        }));
+      } catch(_) {}
+    }
+
+    function loadMeterSession() {
+      try {
+        const data = JSON.parse(localStorage.getItem(METER_STORAGE_KEY));
+        if (data) {
+          isMeterHired = !!data.isHired;
+          meterSeconds = data.seconds || 0;
+          meterDistance = data.distance || 0.00;
+          meterFare = data.fare || 23.00;
+        }
+      } catch(_) {}
+    }
+
+    function playMeterSound(hired) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(hired ? 160 : 220, now);
+        osc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
+        
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.15);
+
+        // Click noise burst for mechanical clunk
+        const bufferSize = audioCtx.sampleRate * 0.04;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const noiseGain = audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.25, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+        noise.connect(noiseGain);
+        noiseGain.connect(audioCtx.destination);
+        noise.start(now);
+      } catch(e) {}
+    }
+
+    function formatMeterTime(totalSecs) {
+      const mins = Math.floor(totalSecs / 60);
+      const secs = totalSecs % 60;
+      return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function updateMeterUI() {
+      const leverArm = document.getElementById('meterLeverArm');
+      const statusBar = document.getElementById('meterStatusBar');
+      const statusText = document.getElementById('meterStatusText');
+      const fareVal = document.getElementById('meterFareVal');
+      const distVal = document.getElementById('meterDistVal');
+      const timeVal = document.getElementById('meterTimeVal');
+      const flagEn = document.getElementById('meterFlagEn');
+      const meterLcd = document.getElementById('meterLcd');
+
+      if (!statusBar || !fareVal) return;
+
+      fareVal.textContent = `₹${meterFare.toFixed(2)}`;
+      if (distVal) distVal.textContent = meterDistance.toFixed(2);
+      if (timeVal) timeVal.textContent = formatMeterTime(meterSeconds);
+
+      if (isMeterHired) {
+        if (leverArm) leverArm.classList.add('down');
+        if (meterLcd) meterLcd.classList.add('hired');
+        statusBar.className = 'meter-status-bar hired';
+        statusText.textContent = 'HIRED / चालू';
+        if (flagEn) flagEn.textContent = 'HIRED';
+      } else {
+        if (leverArm) leverArm.classList.remove('down');
+        if (meterLcd) meterLcd.classList.remove('hired');
+        statusBar.className = 'meter-status-bar vacant';
+        statusText.textContent = 'FOR HIRE / खाली';
+        if (flagEn) flagEn.textContent = 'METER DOWN';
+      }
+    }
+
+    function toggleMeter() {
+      isMeterHired = !isMeterHired;
+      playMeterSound(isMeterHired);
+
+      if (isMeterHired) {
+        startMeterTicker();
+      } else {
+        stopMeterTicker();
+      }
+      updateMeterUI();
+      saveMeterSession();
+    }
+
+    function startMeterTicker() {
+      if (meterInterval) clearInterval(meterInterval);
+      meterInterval = setInterval(() => {
+        if (!isMeterHired) return;
+        meterSeconds++;
+        meterDistance += 0.004; // ~0.24 km per min
+        meterFare += 0.08;      // Increases smoothly with ride/music duration
+        updateMeterUI();
+        saveMeterSession();
+      }, 1000);
+    }
+
+    function stopMeterTicker() {
+      if (meterInterval) {
+        clearInterval(meterInterval);
+        meterInterval = null;
+      }
+    }
+
+    // Init Meter on page load
+    (function initMeter() {
+      loadMeterSession();
+      updateMeterUI();
+      if (isMeterHired) {
+        startMeterTicker();
+      }
+    })();

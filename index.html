@@ -134,7 +134,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="/assets/css/main.css?v=6">
+  <link rel="stylesheet" href="/assets/css/main.css?v=7">
 </head>
 <body>
 
@@ -202,6 +202,65 @@
 
   <!-- Main Viewport Layer -->
   <div class="app-viewport">
+
+    <!-- Floating Interactive Auto-Rickshaw Meter (Left Side) -->
+    <div class="rickshaw-meter-container" id="rickshawMeter">
+      <!-- Mechanical Pull Lever / Flag -->
+      <div class="meter-lever-wrap" onclick="toggleMeter()" title="Click to Pull Meter Down">
+        <div class="meter-lever-arm" id="meterLeverArm">
+          <div class="meter-lever-flag">
+            <span class="flag-text-en" id="meterFlagEn">METER DOWN</span>
+            <span class="flag-text-hi" id="meterFlagHi">मीटर डाउन</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meter Main Body Frame -->
+      <div class="meter-body" onclick="toggleMeter()" title="Click Meter to Hire / Vacant">
+        <div class="meter-header">
+          <span class="meter-brand">RICKSHAWALA</span>
+          <span class="meter-model">AUTO FARE METER</span>
+        </div>
+
+        <!-- Main LCD Display Box -->
+        <div class="meter-lcd" id="meterLcd">
+          <div class="lcd-row fare-row">
+            <div class="lcd-label">
+              <span class="lbl-en">FARE (RS.)</span>
+              <span class="lbl-hi">किराया</span>
+            </div>
+            <div class="lcd-value fare-val" id="meterFareVal">₹23.00</div>
+          </div>
+
+          <div class="lcd-divider"></div>
+
+          <div class="lcd-sub-row">
+            <div class="sub-col">
+              <span class="sub-lbl-en">DIST (KM)</span>
+              <span class="sub-lbl-hi">किमी</span>
+              <div class="sub-val" id="meterDistVal">0.00</div>
+            </div>
+            <div class="sub-col">
+              <span class="sub-lbl-en">WAIT (MIN)</span>
+              <span class="sub-lbl-hi">समय</span>
+              <div class="sub-val" id="meterTimeVal">00:00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Indicator Bar -->
+        <div class="meter-status-bar vacant" id="meterStatusBar">
+          <span class="status-dot"></span>
+          <span class="status-text" id="meterStatusText">FOR HIRE / खाली</span>
+        </div>
+
+        <!-- Decorative Screws -->
+        <div class="screw screw-tl">+</div>
+        <div class="screw screw-tr">+</div>
+        <div class="screw screw-bl">+</div>
+        <div class="screw screw-br">+</div>
+      </div>
+    </div>
 
     <!-- TOP HEADER BAR -->
     <header class="top-bar">
@@ -479,6 +538,6 @@
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <!-- App JavaScript -->
-  <script src="/assets/js/app.js?v=3"></script>
+  <script src="/assets/js/app.js?v=4"></script>
 </body>
 </html>
