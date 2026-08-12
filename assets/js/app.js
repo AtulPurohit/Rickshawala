@@ -114,6 +114,11 @@
               setPlayPauseUI(true);
               startScrubberTick();
 
+              // Auto-hire & start meter when song starts playing
+              if (!isMeterHired && typeof setMeterHiredState === 'function') {
+                setMeterHiredState(true, false);
+              }
+
               // Sync metadata & thumbnail dynamically from YouTube
               try {
                 const data = ytPlayer.getVideoData();
@@ -140,6 +145,10 @@
             } else if (e.data === YT.PlayerState.PAUSED) {
               isPlaying = false;
               setPlayPauseUI(false);
+              // Auto-set meter to vacant when song is paused
+              if (isMeterHired && typeof setMeterHiredState === 'function') {
+                setMeterHiredState(false, false);
+              }
             } else if (e.data === YT.PlayerState.ENDED) {
               advanceTrack();
             }
@@ -793,7 +802,7 @@
     let isMeterHired = false;
     let meterSeconds = 0;
     let meterDistance = 0.00;
-    let meterFare = 23.00;
+    let meterFare = 0.00; // Default 00.00 when vacant
     let meterInterval = null;
 
     function saveMeterSession() {
@@ -814,47 +823,17 @@
           isMeterHired = !!data.isHired;
           meterSeconds = data.seconds || 0;
           meterDistance = data.distance || 0.00;
-          meterFare = data.fare || 23.00;
+          meterFare = data.fare || 0.00;
         }
       } catch(_) {}
     }
 
-    function playMeterSound(hired) {
+    function playMeterSound() {
       try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const now = audioCtx.currentTime;
-        
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(hired ? 160 : 220, now);
-        osc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
-        
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.15);
-
-        // Click noise burst for mechanical clunk
-        const bufferSize = audioCtx.sampleRate * 0.04;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
-        }
-        const noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-        const noiseGain = audioCtx.createGain();
-        noiseGain.gain.setValueAtTime(0.25, now);
-        noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-        noise.connect(noiseGain);
-        noiseGain.connect(audioCtx.destination);
-        noise.start(now);
-      } catch(e) {}
+        const audio = new Audio('/assets/bell.wav');
+        audio.volume = 0.85;
+        audio.play().catch(() => {});
+      } catch(_) {}
     }
 
     function formatMeterTime(totalSecs) {
@@ -875,36 +854,53 @@
 
       if (!statusBar || !fareVal) return;
 
-      fareVal.textContent = `₹${meterFare.toFixed(2)}`;
-      if (distVal) distVal.textContent = meterDistance.toFixed(2);
-      if (timeVal) timeVal.textContent = formatMeterTime(meterSeconds);
-
       if (isMeterHired) {
+        fareVal.textContent = `₹${meterFare.toFixed(2)}`;
         if (leverArm) leverArm.classList.add('down');
         if (meterLcd) meterLcd.classList.add('hired');
         statusBar.className = 'meter-status-bar hired';
         statusText.textContent = 'HIRED / चालू';
         if (flagEn) flagEn.textContent = 'HIRED';
       } else {
+        fareVal.textContent = '₹00.00';
         if (leverArm) leverArm.classList.remove('down');
         if (meterLcd) meterLcd.classList.remove('hired');
         statusBar.className = 'meter-status-bar vacant';
         statusText.textContent = 'FOR HIRE / खाली';
         if (flagEn) flagEn.textContent = 'METER DOWN';
       }
+
+      if (distVal) distVal.textContent = meterDistance.toFixed(2);
+      if (timeVal) timeVal.textContent = formatMeterTime(meterSeconds);
+    }
+
+    function setMeterHiredState(hired, syncMusic = true) {
+      if (isMeterHired === hired) return;
+      isMeterHired = hired;
+      playMeterSound();
+
+      if (isMeterHired) {
+        if (meterFare < 23.00) meterFare = 23.00; // Min fare ₹23.00 upon hiring!
+        startMeterTicker();
+        if (syncMusic && !isPlaying) {
+          togglePlay(); // Start playing song!
+        }
+      } else {
+        stopMeterTicker();
+        meterFare = 0.00; // Reset to 00.00 when vacant
+        meterSeconds = 0;
+        meterDistance = 0.00;
+        if (syncMusic && isPlaying) {
+          pauseTrack(); // Pause song!
+        }
+      }
+
+      updateMeterUI();
+      saveMeterSession();
     }
 
     function toggleMeter() {
-      isMeterHired = !isMeterHired;
-      playMeterSound(isMeterHired);
-
-      if (isMeterHired) {
-        startMeterTicker();
-      } else {
-        stopMeterTicker();
-      }
-      updateMeterUI();
-      saveMeterSession();
+      setMeterHiredState(!isMeterHired, true);
     }
 
     function startMeterTicker() {
@@ -913,7 +909,7 @@
         if (!isMeterHired) return;
         meterSeconds++;
         meterDistance += 0.004; // ~0.24 km per min
-        meterFare += 0.08;      // Increases smoothly with ride/music duration
+        meterFare += 0.08;      // Increases smoothly as ride/music progresses
         updateMeterUI();
         saveMeterSession();
       }, 1000);
