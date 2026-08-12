@@ -473,10 +473,10 @@
     }
 
     // ── Init UI (YT player calls loadTrack(0) via onReady) ──
-    trackTitle.textContent  = PLAYLIST[0].title;
-    trackArtist.textContent = PLAYLIST[0].artist;
-    durationTimeEl.textContent = PLAYLIST[0].duration;
-    discImg.src = `https://i.ytimg.com/vi/${PLAYLIST[0].ytId}/hqdefault.jpg`;
+    if (trackTitle) trackTitle.textContent  = PLAYLIST[0].title;
+    if (trackArtist) trackArtist.textContent = PLAYLIST[0].artist;
+    if (durationTimeEl) durationTimeEl.textContent = PLAYLIST[0].duration;
+    if (discImg) discImg.src = `https://i.ytimg.com/vi/${PLAYLIST[0].ytId}/hqdefault.jpg`;
 
     // ── Fullscreen Toggle Engine ──
     function toggleFullscreen() {

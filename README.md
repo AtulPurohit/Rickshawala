@@ -19,8 +19,10 @@ Before playlists lived in our phones, songs travelled with us.
 
 A rickshaw ride across an Indian city came with its own soundtrack — a cassette, a radio, a crackling speaker and a 90s Hindi banger playing louder than the traffic. **RICKSHAWALA.FUN** is a digital tribute to those rides. A curated, immersive music experience celebrating the songs that built our shared nostalgia.
 
-> *"Pehle to Kabhi Kabhi... Tum To Thehre Pardesi... Chaiyya Chaiyya..."*
+> *"Pehle to Kabhi Kabhi... Tum To Thehre Pardesi... Chaiyya Chaiyya..."*  
 > The bangers. The memories. The ride.
+
+👉 Read the story behind the ride: [https://rickshawala.fun/about](https://rickshawala.fun/about)
 
 ---
 

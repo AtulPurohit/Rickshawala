@@ -41,8 +41,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-  <style>
+  <link rel="stylesheet" href="/assets/css/main.css">
     :root {
       --bg-dark: #0A0A0A;
       --yellow: #F5C518;
@@ -461,8 +460,14 @@
 
     <!-- BOTTOM FLOATING CONTROLS -->
     <div class="bottom-zone">
-      <!-- HORN OK PLEASE BUTTON (BOTTOM LEFT) -->
+      <!-- HORN & LIVE CHAT BUTTONS (BOTTOM LEFT) -->
       <div class="horn-button-container">
+        <button class="live-chat-float" id="liveChatFloatBtn" onclick="onChatBtnClick()" title="Open Live Chat Room">
+          <span class="chat-float-dot"></span>
+          <span>Live Chat</span>
+          <span class="chat-float-badge" id="chatMsgBadge"></span>
+        </button>
+
         <button class="horn-btn" id="hornBtn" onclick="triggerHorn()">
           <div class="horn-icon-circle">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -493,110 +498,38 @@
 
   </div>
 
-  <!-- JavaScript for Live Clock, Firebase Counter, Horn -->
-  <script>
-    // Fullscreen Toggle Engine
-    function toggleFullscreen() {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-        const docEl = document.documentElement;
-        if (docEl.requestFullscreen) docEl.requestFullscreen();
-        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
-        else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if (document.msExitFullscreen) document.msExitFullscreen();
-      }
-    }
+  <!-- Left Side Live Chat Drawer -->
+  <div class="chat-drawer" id="chatDrawer">
+    <div class="chat-header">
+      <div class="chat-header-title">
+        <span class="chat-title-text">💬 LIVE CHAT ROOM</span>
+        <div class="chat-online-badge-wrap" style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.15rem;">
+          <span class="pulse-dot"></span>
+          <span class="chat-online-badge" id="chatOnlineBadge" style="color: #4ade80; font-size: 0.70rem; font-weight: 400; opacity: 0.95;"><span id="chatUserCount">628</span> listening live</span>
+        </div>
+      </div>
+      <span class="close-chat" onclick="toggleChat()">✕</span>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+      <button id="sendChatBtn" onclick="sendChatMessage()" title="Send">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
 
-    function updateFullscreenIcon() {
-      const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
-      const exp = document.getElementById('fullscreenExpandIcon');
-      const comp = document.getElementById('fullscreenCompressIcon');
-      if (exp && comp) {
-        exp.style.display = isFS ? 'none' : 'block';
-        comp.style.display = isFS ? 'block' : 'none';
-      }
-    }
+  <!-- Name Prompt Modal: click-outside-to-close on mobile -->
+  <div class="name-modal-overlay" id="nameModalOverlay" onclick="if(event.target===this) this.style.display='none'">
+    <div class="name-modal-card">
+      <h3>🛺 Rickshawala Live Chat</h3>
+      <p>Enter your name to talk with live listeners on the street!</p>
+      <input type="text" id="userNameInput" placeholder="Enter your name (e.g. Rahul)..." onkeydown="if(event.key==='Enter') saveNameAndJoin()">
+      <button onclick="saveNameAndJoin()">Join Chat Room 🚀</button>
+    </div>
+  </div>
 
-    document.addEventListener('fullscreenchange', updateFullscreenIcon);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
-
-    // Live Clock
-    const liveClockEl = document.getElementById('liveClock');
-    function tickClock() {
-      liveClockEl.textContent = new Date().toLocaleTimeString([], {
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-      });
-    }
-    tickClock();
-    setInterval(tickClock, 1000);
-
-    // Live Visitor Count via Firebase
-    const userCountEl = document.getElementById('userCount');
-    function setCount(n) { if (userCountEl) userCountEl.textContent = n; }
-
-    (function loadFirebasePresence() {
-      function loadScript(url, cb) {
-        const s = document.createElement('script'); s.src = url; s.onload = cb;
-        document.head.appendChild(s);
-      }
-      loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js', () => {
-        loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js', () => {
-          const firebaseConfig = {
-            apiKey: "AIzaSyBoGaTrAZUovsvLgO0UJcQoEGANZQheUY",
-            authDomain: "rickshawala-6ec32.firebaseapp.com",
-            databaseURL: "https://rickshawala-6ec32-default-rtdb.firebaseio.com",
-            projectId: "rickshawala-6ec32",
-            storageBucket: "rickshawala-6ec32.firebasestorage.app",
-            messagingSenderId: "518402469308",
-            appId: "1:518402469308:web:187b4bc2e90b70688d0fb9"
-          };
-          try {
-            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-            const db = firebase.database();
-            const myRef = db.ref('presence').push();
-            db.ref('.info/connected').on('value', snap => {
-              if (!snap.val()) return;
-              myRef.set(true); myRef.onDisconnect().remove();
-            });
-            db.ref('presence').on('value', snap => {
-              setCount(601 + snap.numChildren());
-            });
-          } catch(e) {
-            let n = 628;
-            setInterval(() => {
-              n = Math.max(615, Math.min(650, n + Math.floor(Math.random() * 5) - 2));
-              setCount(n);
-            }, 4000);
-          }
-        });
-      });
-    })();
-
-    // Horn Sound Synthesizer
-    let audioCtx = null;
-    function triggerHorn() {
-      const btn = document.getElementById('hornBtn');
-      btn.classList.add('honking');
-      setTimeout(() => btn.classList.remove('honking'), 450);
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const now = audioCtx.currentTime;
-        const o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator();
-        const g  = audioCtx.createGain();
-        o1.type = 'sawtooth'; o2.type = 'square';
-        o1.frequency.setValueAtTime(370, now); o1.frequency.exponentialRampToValueAtTime(385, now + 0.35);
-        o2.frequency.setValueAtTime(445, now); o2.frequency.exponentialRampToValueAtTime(455, now + 0.35);
-        g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(0.35, now + 0.03);
-        g.gain.setValueAtTime(0.35, now + 0.28);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
-        o1.connect(g); o2.connect(g); g.connect(audioCtx.destination);
-        o1.start(now); o2.start(now); o1.stop(now + 0.4); o2.stop(now + 0.4);
-      } catch(e) {}
-    }
-  </script>
+  <!-- App JavaScript -->
+  <script src="/assets/js/app.js"></script>
 </body>
 </html>
