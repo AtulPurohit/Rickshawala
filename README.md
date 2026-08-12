@@ -54,14 +54,15 @@ A rickshaw ride across an Indian city came with its own soundtrack — a cassett
 | Feature | Details |
 |---|---|
 | 🎵 **Immersive Music Player** | Full YouTube playlist player with vinyl disc animation, scrubber, shuffle & repeat |
-| 💬 **Live Chat Room** | Real-time chat via Firebase RTDB — talk with other nostalgic listeners worldwide |
+| 🛺 **Interactive Auto Meter** | Authentic Indian auto-rickshaw fare meter with mechanical lever, bell sound, live fare ticker (₹23 min fare), and bi-directional song playback sync |
+| 💬 **Live Chat Room** | Real-time chat via Firebase RTDB — multi-color user messages, auto-scrolling & online badge |
 | 🟢 **Live Visitor Counter** | Real-time active listener count with pulsing green dot |
 | ⏰ **Live Clock** | Real-time clock in your local timezone |
 | 📱 **Mobile First** | Fully responsive — feels native on both Android and iOS |
-| 🔴 **Session Memory** | Returns you to where you left off — last song remembered across browser sessions |
+| 🔴 **Session Memory** | Returns you to where you left off — last song & active meter fare remembered across sessions |
 | 🎨 **Cinematic Design** | Full-bleed background, glassmorphism, dark mode, micro-animations |
 | 📋 **Song List** | 24+ curated 90s Hindi tracks visible in a swipeable playlist |
-| 🔊 **Horn Button** | Honk the digital rickshaw horn! (Web Audio API) |
+| 🔊 **Horn & Bell Audio** | Honk the digital rickshaw horn and pull the mechanical meter bell! (Web Audio API & HTML5 Audio) |
 | 🖥️ **Fullscreen Mode** | One click full-screen immersion |
 | 📡 **PWA Ready** | Installable as a Progressive Web App on mobile & desktop |
 
@@ -72,11 +73,11 @@ A rickshaw ride across an Indian city came with its own soundtrack — a cassett
 This is a **zero-dependency, zero-framework** vanilla web project:
 
 - **HTML5 + CSS3 + Vanilla JavaScript** — no bundler, no framework, no build step
-- **YouTube IFrame API** — embedded playlist player
-- **Firebase Realtime Database** — live visitor presence + live chat
+- **YouTube IFrame API** — embedded playlist player with real-time bi-directional meter sync
+- **Firebase Realtime Database** — live visitor presence + real-time multi-color chat room
+- **Web Audio API & HTML5 Audio** — synthesized rickshaw horn sound + authentic mechanical meter bell ring (`bell.wav`)
 - **Google Fonts** — Outfit, Space Mono, Baloo 2, Rozha One
-- **Web Audio API** — rickshaw horn sound effect
-- **localStorage** — session persistence (last played track + username)
+- **localStorage API** — persistent meter fare, trip duration, last played track, and user session memory
 
 ---
 
@@ -84,11 +85,12 @@ This is a **zero-dependency, zero-framework** vanilla web project:
 
 ```
 rickshawala.fun/
-├── index.html          # Main page (player + live chat + home)
+├── index.html          # Main page (player + live meter + live chat + home)
 ├── about.html          # About page
 ├── about/
 │   └── index.html      # About page (canonical URL for /about/)
 ├── assets/
+│   ├── bell.wav        # Authentic mechanical meter bell sound effect
 │   ├── og-preview.jpg  # Social media preview image (1200×630, <150KB)
 │   ├── bg.png          # Desktop background
 │   ├── mobile_bg.png   # Mobile background
