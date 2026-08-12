@@ -816,11 +816,14 @@
       padding: 1rem;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
       gap: 0.8rem;
       scrollbar-width: thin;
       scrollbar-color: rgba(245, 197, 24, 0.3) transparent;
       scroll-behavior: smooth;
+    }
+
+    .chat-messages > .chat-msg:first-child {
+      margin-top: auto;
     }
 
     .chat-msg {

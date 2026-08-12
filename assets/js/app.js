@@ -633,6 +633,15 @@
       return CHAT_COLOR_PALETTE[Math.abs(hash) % CHAT_COLOR_PALETTE.length];
     }
 
+    function scrollToChatBottom() {
+      const box = document.getElementById('chatMessages');
+      if (!box) return;
+      box.scrollTop = box.scrollHeight;
+      setTimeout(() => {
+        box.scrollTop = box.scrollHeight;
+      }, 50);
+    }
+
     function renderChatMessage(msg, key) {
       if (key && renderedMsgKeys.has(key)) return;
       if (key) renderedMsgKeys.add(key);
@@ -662,10 +671,8 @@
       `;
       box.appendChild(div);
 
-      // Smooth auto-scroll upward to latest message
-      requestAnimationFrame(() => {
-        box.scrollTop = box.scrollHeight;
-      });
+      // Smooth auto-scroll to bottom so old messages move UP automatically
+      scrollToChatBottom();
     }
 
     function escapeHtml(str) {
@@ -707,6 +714,7 @@
         // Hide the float badge when chat is open
         const badge = document.getElementById('chatMsgBadge');
         if (badge) badge.classList.remove('visible');
+        setTimeout(scrollToChatBottom, 100);
         if (window.innerWidth <= 768) {
           document.body.style.overflow = 'hidden';
           document.body.style.touchAction = 'none';
