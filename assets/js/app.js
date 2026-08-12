@@ -244,14 +244,22 @@
     }
 
     // ── Playback controls ──
+    let wantToPlay = false;
+
     function playTrack() {
-      if (!ytReady) return;
-      ytPlayer.playVideo();
+      wantToPlay = true;
+      if (!ytReady || !ytPlayer || !ytPlayer.playVideo) return;
+      try {
+        ytPlayer.playVideo();
+      } catch (_) {}
     }
 
     function pauseTrack() {
-      if (!ytReady) return;
-      ytPlayer.pauseVideo();
+      wantToPlay = false;
+      if (!ytReady || !ytPlayer || !ytPlayer.pauseVideo) return;
+      try {
+        ytPlayer.pauseVideo();
+      } catch (_) {}
       if (timerInterval) clearInterval(timerInterval);
     }
 

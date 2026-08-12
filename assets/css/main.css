@@ -319,6 +319,11 @@
       pointer-events: none;
     }
 
+    .music-player-card {
+      pointer-events: auto !important;
+      z-index: 60;
+    }
+
     /* Horn + Live Chat Float (Bottom Left stack) */
     .horn-button-container {
       position: absolute;
