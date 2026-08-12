@@ -1565,14 +1565,22 @@
       font-size: 1.25rem;
       line-height: 1;
       pointer-events: none;
-      transition: left 0.1s linear, transform 0.15s ease-out;
+      transition: left 0.1s linear, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
       filter: drop-shadow(0 3px 6px rgba(0,0,0,0.7));
       user-select: none;
       cursor: pointer;
     }
 
+    .progress-handle.face-left {
+      transform: translate(-50%, -48%) scaleX(1) !important;
+    }
+
     .progress-bar-track:hover .progress-handle {
       transform: translate(-50%, -48%) scaleX(-1) scale(1.25);
+    }
+
+    .progress-bar-track:hover .progress-handle.face-left {
+      transform: translate(-50%, -48%) scaleX(1) scale(1.25);
     }
 
     .progress-bar-track.is-dragging .progress-fill,
@@ -1582,6 +1590,11 @@
 
     .progress-handle.is-dragging {
       transform: translate(-50%, -48%) scaleX(-1) scale(1.38) !important;
+      filter: drop-shadow(0 5px 14px rgba(245, 197, 24, 0.95)) !important;
+    }
+
+    .progress-handle.is-dragging.face-left {
+      transform: translate(-50%, -48%) scaleX(1) scale(1.38) !important;
       filter: drop-shadow(0 5px 14px rgba(245, 197, 24, 0.95)) !important;
     }
 

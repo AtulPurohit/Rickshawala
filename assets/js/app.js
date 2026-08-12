@@ -328,15 +328,18 @@
         const pct = Math.min(100, Math.max(0, (cur / dur) * 100));
         progressFill.style.width  = pct + '%';
         progressHandle.style.left = pct + '%';
+        progressHandle.classList.remove('face-left');
         currentTimeEl.textContent = formatTime(cur);
         if (dur > 0) durationTimeEl.textContent = formatTime(dur);
       } catch(_) {}
     }
 
-    // Ultra-Smooth 60FPS Draggable Scrubber with Pointer & Touch Events
+    // Ultra-Smooth 60FPS Draggable Scrubber with Real-Time Direction Flipping
     (() => {
       const bar = document.getElementById('progressBarTrack');
+      if (!bar) return;
       let dragPct = 0;
+      let lastDragPct = 0;
 
       function getPctFromEvent(e) {
         const rect = bar.getBoundingClientRect();
@@ -345,7 +348,16 @@
       }
 
       function updateUIForPct(pct) {
+        // Real-time direction flip logic
+        const diff = pct - lastDragPct;
+        if (diff < -0.0005) {
+          progressHandle.classList.add('face-left'); // Dragging backward -> face left
+        } else if (diff > 0.0005) {
+          progressHandle.classList.remove('face-left'); // Dragging forward -> face right
+        }
+        lastDragPct = pct;
         dragPct = pct;
+
         const pctString = (pct * 100).toFixed(2) + '%';
         progressFill.style.width = pctString;
         progressHandle.style.left = pctString;
@@ -359,7 +371,9 @@
         isDraggingScrubber = true;
         bar.classList.add('is-dragging');
         progressHandle.classList.add('is-dragging');
-        updateUIForPct(getPctFromEvent(e));
+        const initialPct = getPctFromEvent(e);
+        lastDragPct = initialPct;
+        updateUIForPct(initialPct);
       }
 
       function onDragMove(e) {
@@ -374,6 +388,7 @@
         isDraggingScrubber = false;
         bar.classList.remove('is-dragging');
         progressHandle.classList.remove('is-dragging');
+        progressHandle.classList.remove('face-left'); // Reset to face right after drag ends
 
         // Execute YouTube seek ONCE when user releases handle
         if (ytReady && ytPlayer.getDuration) {
