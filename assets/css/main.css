@@ -315,6 +315,8 @@
       flex-direction: column;
       align-items: center;
       gap: 1rem;
+      z-index: 50;
+      pointer-events: none;
     }
 
     /* Horn + Live Chat Float (Bottom Left stack) */
@@ -326,6 +328,8 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 0.55rem;
+      z-index: 60;
+      pointer-events: auto;
     }
 
     .horn-btn {
@@ -400,6 +404,8 @@
       position: absolute;
       right: 0;
       bottom: 2rem;
+      z-index: 60;
+      pointer-events: auto;
     }
 
     .instagram-btn {
@@ -1123,6 +1129,7 @@
       z-index: 20;
       width: 100%;
       overflow: hidden;
+      pointer-events: none;
     }
 
     .card {
@@ -1140,6 +1147,7 @@
       overflow-y: auto !important;
       scrollbar-width: thin;
       scrollbar-color: rgba(245, 197, 24, 0.4) transparent;
+      pointer-events: auto;
     }
 
     .card h1 {

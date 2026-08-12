@@ -66,6 +66,8 @@
 
     // ── YouTube IFrame API callback ──
     function onYouTubeIframeAPIReady() {
+      const ytElem = document.getElementById('ytPlayer');
+      if (!ytElem) return;
       ytPlayer = new YT.Player('ytPlayer', {
         width: '100%', height: '100%',
         playerVars: {
@@ -731,10 +733,12 @@
       isChatOpen = !isChatOpen;
       const drawer = document.getElementById('chatDrawer');
       const btn = document.getElementById('chatBtn');
+      if (!drawer) return;
+
       if (isChatOpen) {
         if (!chatsRef) renderInitialChat();
         drawer.classList.add('open');
-        btn.style.color = 'var(--yellow)';
+        if (btn) btn.style.color = 'var(--yellow)';
         // Hide the float badge when chat is open
         const badge = document.getElementById('chatMsgBadge');
         if (badge) badge.classList.remove('visible');
@@ -745,7 +749,7 @@
         }
       } else {
         drawer.classList.remove('open');
-        btn.style.color = '';
+        if (btn) btn.style.color = '';
         if (window.innerWidth <= 768) {
           document.body.style.overflow = '';
           document.body.style.touchAction = '';
