@@ -613,6 +613,26 @@
       } catch (_) {}
     }
 
+    // ── 7-Color Vibrancy Palette for Live Chat Users ──
+    const CHAT_COLOR_PALETTE = [
+      { text: '#f5c518', bg: 'rgba(245, 197, 24, 0.12)', border: '#f5c518' },   // Golden Amber
+      { text: '#38bdf8', bg: 'rgba(56, 189, 248, 0.12)', border: '#38bdf8' },   // Sky Cyan
+      { text: '#4ade80', bg: 'rgba(74, 222, 128, 0.12)', border: '#4ade80' },   // Neon Green
+      { text: '#f472b6', bg: 'rgba(244, 114, 182, 0.12)', border: '#f472b6' },   // Hot Pink
+      { text: '#c084fc', bg: 'rgba(192, 132, 252, 0.12)', border: '#c084fc' },   // Electric Violet
+      { text: '#fb923c', bg: 'rgba(251, 146, 60, 0.12)', border: '#fb923c' },   // Sunset Coral
+      { text: '#2dd4bf', bg: 'rgba(45, 212, 191, 0.12)', border: '#2dd4bf' }    // Mint Teal
+    ];
+
+    function getUserColor(name) {
+      let hash = 0;
+      const str = (name || '').trim().toLowerCase();
+      for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return CHAT_COLOR_PALETTE[Math.abs(hash) % CHAT_COLOR_PALETTE.length];
+    }
+
     function renderChatMessage(msg, key) {
       if (key && renderedMsgKeys.has(key)) return;
       if (key) renderedMsgKeys.add(key);
@@ -621,13 +641,21 @@
       if (!box) return;
 
       const isSelf = msg.user === chatUserName;
+      const col = getUserColor(msg.user);
       const div = document.createElement('div');
-      div.className = `chat-msg ${isSelf ? 'self' : ''}`;
+      div.className = `chat-msg ${isSelf ? 'self' : 'other'}`;
+      div.style.backgroundColor = col.bg;
+      if (isSelf) {
+        div.style.borderRight = `3px solid ${col.border}`;
+      } else {
+        div.style.borderLeft = `3px solid ${col.border}`;
+      }
+
       const timeDisplay = msg.timeStr || (msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
       
       div.innerHTML = `
         <div class="chat-msg-meta">
-          <span class="chat-msg-user">${escapeHtml(msg.user)}${isSelf ? ' (You)' : ''}</span>
+          <span class="chat-msg-user" style="color:${col.text}">${escapeHtml(msg.user)}${isSelf ? ' (You)' : ''}</span>
           <span>${timeDisplay}</span>
         </div>
         <div class="chat-msg-text">${escapeHtml(msg.text)}</div>
