@@ -1871,6 +1871,15 @@
     // ytId is populated dynamically from getVideoData() when songs play
     const DEFAULT_COVER = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=150&auto=format&fit=crop&q=80";
 
+    // ── Session persistence (track position + username) ──
+    const SESSION_KEY = 'rickshawala_session';
+    function saveSession() {
+      try { localStorage.setItem(SESSION_KEY, JSON.stringify({ trackIdx: currentTrackIdx })); } catch(_) {}
+    }
+    function loadSession() {
+      try { const s = JSON.parse(localStorage.getItem(SESSION_KEY)); return s || {}; } catch(_) { return {}; }
+    }
+
     const PLAYLIST = [
       { title: "Pehle to Kabhi Kabhi",              artist: "Altaf Raja",                                   duration: "6:19" },
       { title: "Ek Sanam Chahiye Aashiqui Ke Liye",  artist: "Kumar Sanu",                                   duration: "6:13" },
@@ -1943,13 +1952,16 @@
           onReady() {
             ytReady = true;
             try {
+              // Restore session: resume from last played track
+              const session = loadSession();
+              const resumeIdx = (session.trackIdx && session.trackIdx > 0) ? session.trackIdx : 0;
               ytPlayer.cuePlaylist({
                 listType: 'playlist',
                 list: 'PLYErt37hS-BM',
-                index: 0
+                index: resumeIdx
               });
             } catch(_) {}
-            loadTrack(0);
+            loadTrack(loadSession().trackIdx || 0);
 
             // Poll & sync live playlist items directly from YouTube API
             let tries = 0;
@@ -2117,6 +2129,7 @@
       if (ytReady && ytPlayer.playVideoAt) {
         ytPlayer.playVideoAt(idx);
       }
+      saveSession(); // persist current track for next visit
       renderPlaylist();
       if (isPlaylistOpen) togglePlaylist();
     }
@@ -2583,8 +2596,8 @@
     </div>
   </div>
 
-  <!-- Name Prompt Modal -->
-  <div class="name-modal-overlay" id="nameModalOverlay">
+  <!-- Name Prompt Modal: click-outside-to-close on mobile -->
+  <div class="name-modal-overlay" id="nameModalOverlay" onclick="if(event.target===this) this.style.display='none'">
     <div class="name-modal-card">
       <h3>🛺 Rickshawala Live Chat</h3>
       <p>Enter your name to talk with live listeners on the street!</p>
